@@ -77,7 +77,7 @@ services:
       - ./src/composer.json:/var/www/html/composer.json
       - ./src/composer.lock:/var/www/html/composer.lock
     working_dir: /var/www/html
-    command: composer install
+    command: composer install --no-interaction
 
 volumes:
   mysql_data:

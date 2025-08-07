@@ -1,5 +1,7 @@
 node_modules
-public/dist # evita trazer build do Node pro PHP (caso for gerado externamente)
+public/dist
+libs/
+vendor/
 resources
 *.log
 *.env
