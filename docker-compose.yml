@@ -1,0 +1,112 @@
+services:
+  # Web Server - Nginx
+  nginx:
+    image: nginx:latest
+    container_name: nginx-server
+    ports:
+      - "80:80" # Exposes port 80 on your host to port 80 in the container
+    volumes:
+      - ./src/:/var/www/html # Mounts your project's src directory to Nginx's webroot
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf # Nginx configuration
+    depends_on:
+      - php
+      - mysql
+      #- mssql
+      #- postgres
+
+  # PHP-FPM
+  php:
+    build:
+      context: ./php # Path to the Dockerfile for PHP
+      dockerfile: Dockerfile
+    container_name: php8.4-fpm
+    volumes:
+      - ./src/:/var/www/html # Shared source code
+    working_dir: /var/www/html # Set working directory for composer and php commands
+    ports:
+      - "9000:9000" # Exposes PHP-FPM port to your host (optional, for direct access)
+      - "9003:9003" # Exposes XDebug port to host
+    environment:
+      # MySQL Environment Variables
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: # Change this
+      MYSQL_USER: youruser
+      MYSQL_PASSWORD: strong@#$&$%&*password
+
+      # MSSQL Environment Variables
+      MSSQL_HOST: mssql
+      MSSQL_DATABASE: # Change this
+      MSSQL_USER: youruser
+      MSSQL_PASSWORD: strong@#$&$%&*password
+
+      # PostgreSQL Environment Variables
+      POSTGRES_HOST: postgres
+      POSTGRES_DATABASE: # Change this
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: strong@#$&$%&*password
+    depends_on:
+      - mysql
+      #- mssql
+      #- postgres
+
+  # Microsoft SQL Server Database
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "strong@#$&$%&*password" # Change this to your desired SA password
+      ACCEPT_EULA: "Y"
+    ports:
+      - 1433:1433 # Expose the MSSQL port to host for direct access
+    volumes:
+      - ./mssql-data:/var/opt/mssql/data
+      - ./backups:/backups  # New volume mount
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: strong@#$&$%&*password # Change this
+      MYSQL_DATABASE: # Change this
+      MYSQL_USER: youruser # Change this
+      MYSQL_PASSWORD: strong@#$&$%&*password # Change this
+    ports:
+      - "3306:3306" # Exposes MySQL port to your host (optional, for direct access)
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+  
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres # Change this
+      POSTGRES_PASSWORD: strong@#$&$%&*password # Change this
+      POSTGRES_DB: # Change this
+    ports:
+      - "5432:5432" # Exposes PostgreSQL port to your host (optional, for direct access)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  php_composer:
+    build: ./php
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - php
+
+  # # Composer (for one-off commands)
+  # composer:
+  #   image: composer:latest
+  #   container_name: php_composer
+  #   volumes:
+  #     - ./src:/app
+  #   working_dir: /app
+  #   command: ["composer dump-autoload -o", "composer update --no-interaction", "composer install --no-interaction"] # Just an example, you'll run specific commands
+
+volumes:
+  mysql_data: # Defines a named volume for persistent MySQL data
+  mssql_data: # Defines a named volume for persistent MSSQL data
+  postgres_data: # Defines a named volume for persistent PostgreSQL data
