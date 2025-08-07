@@ -17,14 +17,31 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install additional PHP extensions
-RUN pecl install redis && docker-php-ext-enable redis
 RUN pecl install mongodb && docker-php-ext-enable mongodb
+
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    git \
+    curl
+
+# Install mysqli extension
+RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+
+# If you use PDO, also install:
+# RUN docker-php-ext-install pdo pdo_mysql
 
 # Install the ODBC driver for MySQL
 RUN apt-get update && apt-get install -y unixodbc unixodbc-dev && rm -rf /var/lib/apt/lists/*
 
 # Install PHP Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Add Composer to the PATH
+ENV PATH="$PATH:/usr/local/bin"
 
 # Set the working directory
 WORKDIR /var/www/html

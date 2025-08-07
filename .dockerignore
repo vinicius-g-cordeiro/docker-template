@@ -1,6 +1,13 @@
 # Ignore all node_modules directories from being included in the build context
 **/node_modules
 
+# Ignore all dist directories from being included in the build context
+**/dist
+
+# Ignore all vendor directories from being included in the build context
+**/vendor
+**/libs
+
 # Other common things to ignore
 .git
 .vscode

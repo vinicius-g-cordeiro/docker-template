@@ -1,0 +1,14 @@
+
+# ignore .env file
+.env
+
+mysql_data/
+mongodb_data/
+
+# Ignore all node_modules directories from being included in the commit  
+src/node_modules/
+
+# Ignore all the vendor and libs directories from being included in the commit 
+src/libs/
+src/vendor/
+

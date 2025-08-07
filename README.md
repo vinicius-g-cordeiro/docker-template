@@ -18,11 +18,13 @@ Simple Docker template for development using
 ## How to use ##
 
 1. Clone the repository
-2. Run the command: docker-compose up
+2. Create a .env file and set the environment variables
 3. Add your project files to the src directory 
-4. Run the command: docker-compose up (if you haven't done it yet)
-5. Open your browser and go to http://localhost
-6. Happy coding! 
+4. Run the command: docker-compose build
+5. Run the command: docker-compose up -d (so it will run in the background)
+6. Open your browser and go to http://localhost
+7. Happy coding! 
+8. (Optional) If you want to connect to dbeaver set host as localhost, port as 3306, user as <MYSQL_USER> on your .env file and password as <MYSQL_PASSWORD> on your .env file as well.
 
 ### Nginx Configuration ###
 
@@ -86,12 +88,25 @@ You can add more extensions by adding them to the list.
 | docker compose up -d | Run all containers in the background |
 | docker compose down | Stop and remove all containers |
 | docker compose build | Build images |
+| docker compose build --no-cache | Build images without cache |
 | docker compose restart | Restart all containers |
 | docker compose logs -f | Follow the logs of the containers |
-| docker compose exec php bash | Enter the bash shell of the php container |
-| docker compose exec nginx bash | Enter the bash shell of the nginx container |
-| docker compose exec mysql bash | Enter the bash shell of the mysql container |
-| docker compose exec mongodb bash | Enter the bash shell of the mongodb container |
+| docker compose ps -a | List all containers |
+| docker compose exec php bash | Enter the container php bash |
+| docker compose exec node bash | Enter the container node bash |
+| docker compose exec mysql bash | Enter the container mysql bash |
+| docker compose exec mongodb bash | Enter the container mongodb bash |
+
+### Troubleshooting ###
+
+Create a .env file and set the environment variables in it.
+
+If you have any issues with MySQL connections, delete the mysql_data volume and directory and try again.
+
+If you have any issues with MongoDB connections, delete the mongodb_data volume and directory and try again.
+
+Check the logs for any errors.
+
 
 
 ### Docker compose up command ### 
