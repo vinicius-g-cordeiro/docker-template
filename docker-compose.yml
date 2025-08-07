@@ -1,8 +1,6 @@
 # Docker Compose configuration for a PHP development environment with Nginx, PHP 8.4 FPM, and SQL and No-SQL databases
 # This setup includes MySQL, and MongoDB as database options
 # All rights reserved (2025 Vinícius Cordeiro <vinicordeirogo@gmail.com>)
-version: '3.8'
-
 services:
   nginx:
     image: nginx:latest
@@ -12,6 +10,7 @@ services:
     volumes:
       - ./src:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/errors:/usr/share/nginx/html/errors:ro
     depends_on:
       - php
 
@@ -32,20 +31,8 @@ services:
       MYSQL_USER: db_user
       MYSQL_PASSWORD: db_password
 
-      MSSQL_HOST: mssql
-      MSSQL_DATABASE: db_name
-      MSSQL_USER: db_user
-      MSSQL_PASSWORD: db_password
-
-      POSTGRES_HOST: postgres
-      POSTGRES_DATABASE: db_name
-      POSTGRES_USER: db_user
-      POSTGRES_PASSWORD: db_password
-
     depends_on:
       - mysql
-      - mssql
-      - postgres
 
   mysql:
     image: mysql:8.0
@@ -60,30 +47,16 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
-
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    environment:
-      SA_PASSWORD: db_password
-      ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
+  
+  node:
+    image: node:alpine
+    container_name: node
     volumes:
-      - ./mssql_data:/var/opt/mssql/data
-      - ./backups:/backups
-
-  postgres:
-    image: postgres:14
-    container_name: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: db_user
-      POSTGRES_PASSWORD: db_password
-      POSTGRES_DB: db_name
+      - ./src:/usr/src/app
+    working_dir: /usr/src/app
     ports:
-      - "5432:5432"
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - "3000:3000"
+    command: sh -c "npm install && npm start"
 
   mongodb:
     image: mongo:latest
@@ -95,6 +68,4 @@ services:
 
 volumes:
   mysql_data:
-  mssql_data:
-  postgres_data:
   mongodb_data:
