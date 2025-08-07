@@ -1,6 +1,7 @@
 FROM php:8.4-fpm
 
-# Instala dependências básicas + ODBC
+# Install basic dependencies and tools 
+# This includes tools for building PHP extensions and other utilities
 RUN apt-get update && apt-get install -y \
     apt-transport-https \
     gnupg2 \
@@ -16,19 +17,44 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-# Adiciona o repositório da Microsoft para o ODBC Driver
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql17
+# The extensions that are installed are:
+# - bcmath
+# - calendar
+# - exif
+# - gd
+# - intl
+# - mbstring
+# - mysqli
+# - opcache
+# - pcntl
+# - pdo_mssql
+# - pdo_mysql
+# - pdo_pgsql
+# - soap
+# - sockets
+# - zip
+# - xdebug
+# - curl
+# Install PHP extensions and enable them 
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd intl mbstring pdo_mysql mysqli opcache pcntl soap sockets zip xdebug curl \
+    && docker-php-ext-enable gd intl mbstring pdo_mysql mysqli opcache pcntl soap sockets zip xdebug curl
+# Install additional PHP extensions
 
-# Instala extensões PHP para SQL Server (pdo_sqlsrv e sqlsrv)
-RUN pecl install sqlsrv-8.2.0 pdo_sqlsrv-8.2.0 \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+# Install Redis PHP extension
+# This extension is used for caching and session management
+RUN pecl install redis && \
+    docker-php-ext-enable redis
 
-# Opcional: também pode ativar o pdo_odbc se quiser usar via ODBC diretamente
-RUN docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr && \
-    docker-php-ext-install pdo_odbc 
+# Install PHP extensions and mongodb
+RUN pecl install zlib zip mongodb \
+    && docker-php-ext-enable zip \
+    && docker-php-ext-enable mongodb
+
+# Install the ODBC driver for MySQL
+RUN apt-get update && \
+    apt-get install -y unixodbc unixodbc-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Xdebug
 RUN pecl install xdebug-3.2.1 && \
@@ -41,14 +67,19 @@ RUN echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-
     && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-# Instala Composer
+# Install PHP Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Define diretório de trabalho
+# Set the working directory
 WORKDIR /var/www/html
 
-# Cria e ajusta permissões dos diretórios
+# Set the permissions for the web root directory 
+# This ensures that the web server can write to the necessary directories
+# and that the PHP-FPM user has the correct permissions
 RUN mkdir -p /var/www/temp/site /var/www/logs /var/www/cache /var/www/html/temp /var/www/html/cache \
     && chmod -R 0777 /var/www/logs /var/www/temp /var/www/temp/site /var/www/html/temp /var/www/html/cache \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 0777 /var/www/html
+
+# Expose the port that PHP-FPM listens on
+EXPOSE 9000
