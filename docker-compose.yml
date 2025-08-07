@@ -5,6 +5,15 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx_server
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    cpuset: "1"
     ports:
       - "80:80"
     volumes:
@@ -18,14 +27,22 @@ services:
       context: ./php
       dockerfile: Dockerfile
     container_name: php_8.4_fpm
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    cpuset: "1"
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
     ports:
       - "9000:9000"
-      - "9003:9003"
     environment:
-      MYSQL_HOST: mysql
+      MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -33,7 +50,7 @@ services:
       - mysql
 
   mysql:
-    image: mysql:8.0
+    image: mysql:${MYSQL_VERSION}
     restart: unless-stopped
     container_name: mysql
     environment:
@@ -47,11 +64,14 @@ services:
       - ./mysql_data:/var/lib/mysql
   
   node:
-    image: node:alpine
+    image: node:${NODE_VERSION}
     container_name: node
+    restart: unless-stopped
     volumes:
       - ./src:/usr/src/app
     working_dir: /usr/src/app
+    environment:
+      NODE_ENV: ${NODE_ENV}
     ports:
       - "3000:3000"
     command: sh -c "npm install && npm start"

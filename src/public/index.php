@@ -9,6 +9,26 @@
  * @link https://linkedin.com/in/vinicordeirox 
  */
 
+include "../libs/autoload.php";
+
+use Config\DotEnvLoader;
+
+$envload = new DotEnvLoader();
+$envload->load('../');
+if(getenv("APP_DEBUG") == "true"){
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    // set all error as exception 
+    set_error_handler(function ($severity, $message, $file, $line) {
+        throw new ErrorException($message, $severity, $severity, $file, $line);
+    });
+}else{
+    error_reporting(0);
+    ini_set('display_errors', 0);
+}
+
+try{
+    
 echo "<!DOCTYPE html>
         <html>
             <head>
@@ -21,5 +41,8 @@ echo "<!DOCTYPE html>
                 </footer>
             </body>
         </html>";
-
-exit(0);
+}catch(Exception $e){
+    dd($e);
+}finally{
+    exit(0);
+}

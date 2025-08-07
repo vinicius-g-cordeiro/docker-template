@@ -43,6 +43,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Add Composer to the PATH
 ENV PATH="$PATH:/usr/local/bin"
 
+# copy .env from host to container 
+COPY .env /var/www/html/.env
+
 # Set the working directory
 WORKDIR /var/www/html
 

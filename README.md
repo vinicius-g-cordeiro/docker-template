@@ -15,6 +15,13 @@ Simple Docker template for development using
 - Docker
 - Docker Compose
 
+## Limitations ##
+
+- This template is not optimized for production.
+- The database is not persistent.
+- The project files are not mounted to the container.
+- You will need to create a .env file and set the environment variables, but there is an example of a .env file in the root directory: .env.example
+
 ## How to use ##
 
 1. Clone the repository
@@ -60,22 +67,31 @@ You can add more extensions by adding them to the list.
 ## Project Structure ##
 
 ```
-├── .dockerignore
-├── README.md
+.
 ├── docker-compose.yml
+├── image-1.png
+├── image-2.png
+├── image.png
 ├── nginx
-    ├── .default.conf.kate-swp
-    └── default.conf
+│   ├── default.conf
 ├── node
-    ├── .dockerignore
-    └── Dockerfile
+│   └── Dockerfile
 ├── package-lock.json
-└── php
-    ├── .dockerignore
-    └── Dockerfile
+├── php
+│   └── Dockerfile
+├── README.md
 └── src
-    ├── your_project_files
-└── .gitignore
+    ├── app
+    ├── composer.json
+    ├── composer.lock
+    ├── config
+    │   └── config.php
+    ├── package-lock.json
+    ├── public
+    │   ├── index.php
+    │   └── info.php
+    └── tests
+        └── test.php
 ```
 
 #### Remember to change the port in the docker-compose.yml file if you change the port in the default.conf file ####
@@ -92,14 +108,19 @@ You can add more extensions by adding them to the list.
 | docker compose restart | Restart all containers |
 | docker compose logs -f | Follow the logs of the containers |
 | docker compose ps -a | List all containers |
-| docker compose exec php bash | Enter the container php bash |
-| docker compose exec node bash | Enter the container node bash |
-| docker compose exec mysql bash | Enter the container mysql bash |
-| docker compose exec mongodb bash | Enter the container mongodb bash |
+| docker compose stop \<container> | Stop a container |
+| docker compose rm -f | Remove all containers |
+| docker compose stats | Show stats for all containers |
+| docker compose exec php | Enter the container php |
+| docker compose exec node | Enter the container node |
+| docker compose exec mysql | Enter the container mysql |
+| docker compose exec mongodb | Enter the container mongodb |
+| docker compose exec composer | Enter the container composer |
+| docker compose exec php composer \<command> | Run a command in the composer container php |
 
 ### Troubleshooting ###
 
-Create a .env file and set the environment variables in it.
+Create a .env file and set the environment variables in it. There is an example of a .env file in the root directory: .env.example 
 
 If you have any issues with MySQL connections, delete the mysql_data volume and directory and try again.
 
@@ -109,7 +130,7 @@ Check the logs for any errors.
 
 
 
-### Docker compose up command ### 
+### Docker compose up command - (Optionally add the -d flag to run in the background) ### 
 ![Docker compose up](image.png) 
 
 ### If you visit http://localhost/index.php ###
@@ -122,12 +143,14 @@ Check the logs for any errors.
 ### Additional Information ###
 
 - If you want the database to be persistent you can use the volumes in the docker-compose.yml file. (./mysql-data)
-- If you want to use the database in a different port you can change the port in the docker-compose.yml file. 
 - Let me know if you find any bugs or have any suggestions.
 - Hit me up on Ig: @vinicordeirox or LinkedIn https://www.linkedin.com/in/vinicordeirox/
 - Star the repository on GitHub: https://github.com/vinicius-g-cordeiro/docker-template <a href="https://github.com/vinicius-g-cordeiro/docker-template" target="_blank"> </a>
 
 ### Contact Info ###
+
+[<img src="file.png" width="256" height="256"> ](https://github.com/vinicius-g-cordeiro)
+
 | Link | Description |
 | --- | --- |
 | https://github.com/vinicius-g-cordeiro | GitHub |

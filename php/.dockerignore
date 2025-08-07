@@ -5,3 +5,5 @@ vendor/
 resources
 *.log
 *.env
+.vscode
+.idea
