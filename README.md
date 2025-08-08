@@ -117,6 +117,8 @@ You can add more extensions by adding them to the list.
 | docker compose exec mongodb | Enter the container mongodb |
 | docker compose exec composer | Enter the container composer |
 | docker compose exec php composer \<command> | Run a command in the composer container php |
+| docker stop $(docker ps -q) | Stop all containers |
+| docker rm -f $(docker ps -a -q) | Remove all containers |
 
 ### Troubleshooting ###
 
