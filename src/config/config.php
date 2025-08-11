@@ -38,7 +38,15 @@ class DotEnvLoader
      */
    public function load($path): void
    {
-      $lines = file($path . '/.env');
+      $newPath = realpath(__DIR__ . '/../' . $path);
+      $files = glob($newPath);
+      if(empty($files)){
+         dd('File not found');
+         return;
+      }
+      $lines = file($files[0]);
+      // // Load the .env file
+      // $lines = file($path);
       foreach ($lines as $line) {
          $line = trim($line);
          if (strpos($line, '#') === 0 || $line === '') {
@@ -48,8 +56,7 @@ class DotEnvLoader
          $key = trim($parts[0]);
          $value = trim($parts[1]);
          putenv("$key=$value");
-         $_ENV[$key] = $value;
-         $_SERVER[$key] = $value;
+         $_ENV[$key] = $value;         
       }
    }
 }

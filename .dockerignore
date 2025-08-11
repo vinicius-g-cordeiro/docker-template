@@ -12,4 +12,3 @@
 .git
 .vscode
 npm-debug.log
-*.env

@@ -38,6 +38,7 @@ services:
     cpuset: "1"
     volumes:
       - ./src:/var/www/html
+      - ./.env:/var/www/html/.env
     working_dir: /var/www/html
     ports:
       - "9000:9000"
